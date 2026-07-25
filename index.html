@@ -262,15 +262,21 @@ function spawnWave() {
   if (wave % 5 === 0) { spawnBoss(); return; }
   var n = Math.min(3 + wave, 14);
   var types = ['thug','thug','samurai','archer','thug','elite'];
+  // Spawn enemies in front of the player, spread across screen
+  var spawnLeft = player.x > WW * 0.6; // if player is right side, spawn ahead (right)
+  var baseX = spawnLeft ? player.x + rnd(200,400) : Math.max(player.x + rnd(300,600), W * 0.6);
   for (var i = 0; i < n; i++) {
     var type = types[rint(0, Math.min(types.length-1, 1+Math.floor(wave/2)))];
-    var x = player.x + rnd(300,900) * (Math.random()<0.5?1:-1);
+    // Spread enemies across a range in front of player
+    var x = baseX + i * rnd(40,80) + rnd(-20,20);
     enemies.push(mkEnemy(type, clamp(x, 50, WW-100)));
   }
 }
 
 function spawnBoss() {
-  boss = mkBoss(player.x + rnd(300,500) * (Math.random()<0.5?1:-1));
+  // Boss always spawns ahead of the player
+  var dir = player.x > WW * 0.5 ? -1 : 1;
+  boss = mkBoss(clamp(player.x + dir * rnd(200,400), 200, WW-200));
   boss.x = clamp(boss.x, 200, WW-200);
   Snd.boss();
   floaters.push({x:boss.x+20, y:boss.y-30, t:100, text:'BOSS: DRAGON HEAD ONI', col:PAL.red, big:true});
